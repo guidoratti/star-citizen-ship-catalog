@@ -14,54 +14,68 @@
   <div class="app-shell">
     <!-- TOP HEADER BAR -->
     <header class="top-header">
-      <div class="header-inner">
-        <div class="brand" id="brandHome" title="Back to Ship Catalog">
-          <span class="brand-sub">STAR CITIZEN</span>
-          <h1 class="brand-title">SHIP CATALOG</h1>
+      <div class="header-layout">
+        <div class="header-left">
+          <div class="header-top-row">
+            <div class="brand" id="brandHome" title="Back to Ship Catalog">
+              <span class="brand-sub">STAR CITIZEN</span>
+              <h1 class="brand-title">SHIP CATALOG</h1>
+            </div>
+
+            <div class="search-wrap">
+              <span class="search-icon" aria-hidden="true">🔍</span>
+              <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search ships, manufacturers, roles (e.g. Constellation, Aegis, Fighter)..."
+                autocomplete="off"
+              />
+              <button id="clearSearchBtn" class="clear-btn hidden" title="Clear search" aria-label="Clear search">✕</button>
+            </div>
+          </div>
+
+          <!-- FILTER & SORT BAR -->
+          <div class="filter-bar" id="filterBar">
+            <div class="filter-tabs" role="tablist">
+              <button class="filter-tab active" data-filter="relevant">★ Most Relevant</button>
+              <button class="filter-tab" data-filter="all">All Ships</button>
+              <button class="filter-tab" data-filter="ingame">Available In-Game (aUEC)</button>
+              <button class="filter-tab" data-filter="flight-ready">Flight Ready</button>
+              <button class="filter-tab" data-filter="in-concept">In Concept</button>
+              <button class="filter-tab" data-filter="purchasable">RSI Store</button>
+            </div>
+
+            <div class="filter-controls">
+              <span id="resultCount" class="result-count"></span>
+              <select id="mfgSelect" class="control-select" aria-label="Filter by Manufacturer">
+                <option value="all">All Manufacturers</option>
+              </select>
+              <select id="sortSelect" class="control-select" aria-label="Sort Ships">
+                <option value="relevant">Sort: Most Relevant</option>
+                <option value="name">Sort: Name (A–Z)</option>
+                <option value="auec-asc">Sort: In-Game aUEC (Low → High)</option>
+                <option value="auec-desc">Sort: In-Game aUEC (High → Low)</option>
+                <option value="price-asc">Sort: Pledge USD (Low → High)</option>
+                <option value="price-desc">Sort: Pledge USD (High → Low)</option>
+                <option value="cargo-desc">Sort: Cargo (High → Low)</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div class="search-wrap">
-          <span class="search-icon" aria-hidden="true">🔍</span>
-          <input
-            type="text"
-            id="searchInput"
-            class="search-input"
-            placeholder="Search ships, manufacturers, roles (e.g. Constellation, Aegis, Fighter)..."
-            autocomplete="off"
-          />
-          <button id="clearSearchBtn" class="clear-btn hidden" title="Clear search" aria-label="Clear search">✕</button>
-        </div>
+        <!-- 32-BIT RETRO ARCADE LIBERATOR FLIGHT VIEWPORT -->
+        <div class="header-right">
+          <div class="retro-viewport" id="liberatorViewport" title="Anvil Liberator — Click to view ship details">
+            <canvas id="liberatorCanvas" width="380" height="108"></canvas>
+            <div class="retro-scanlines" aria-hidden="true"></div>
+            <span class="retro-hud-label">ANVIL LIBERATOR</span>
+            <span class="retro-hud-status">● 32-BIT CRUISE</span>
+          </div>
 
-        <div class="header-meta">
-          <span id="totalBadge" class="meta-pill">Loading...</span>
-        </div>
-      </div>
-
-      <!-- FILTER & SORT BAR -->
-      <div class="filter-bar" id="filterBar">
-        <div class="filter-tabs" role="tablist">
-          <button class="filter-tab active" data-filter="relevant">★ Most Relevant</button>
-          <button class="filter-tab" data-filter="all">All Ships</button>
-          <button class="filter-tab" data-filter="ingame">Available In-Game (aUEC)</button>
-          <button class="filter-tab" data-filter="flight-ready">Flight Ready</button>
-          <button class="filter-tab" data-filter="in-concept">In Concept</button>
-          <button class="filter-tab" data-filter="purchasable">RSI Store</button>
-        </div>
-
-        <div class="filter-controls">
-          <span id="resultCount" class="result-count"></span>
-          <select id="mfgSelect" class="control-select" aria-label="Filter by Manufacturer">
-            <option value="all">All Manufacturers</option>
-          </select>
-          <select id="sortSelect" class="control-select" aria-label="Sort Ships">
-            <option value="relevant">Sort: Most Relevant</option>
-            <option value="name">Sort: Name (A–Z)</option>
-            <option value="auec-asc">Sort: In-Game aUEC (Low → High)</option>
-            <option value="auec-desc">Sort: In-Game aUEC (High → Low)</option>
-            <option value="price-asc">Sort: Pledge USD (Low → High)</option>
-            <option value="price-desc">Sort: Pledge USD (High → Low)</option>
-            <option value="cargo-desc">Sort: Cargo (High → Low)</option>
-          </select>
+          <div class="header-meta">
+            <span id="totalBadge" class="meta-pill">Loading...</span>
+          </div>
         </div>
       </div>
     </header>
