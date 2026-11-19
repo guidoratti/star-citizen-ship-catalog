@@ -42,9 +42,10 @@
         <div class="filter-tabs" role="tablist">
           <button class="filter-tab active" data-filter="relevant">★ Most Relevant</button>
           <button class="filter-tab" data-filter="all">All Ships</button>
+          <button class="filter-tab" data-filter="ingame">Available In-Game (aUEC)</button>
           <button class="filter-tab" data-filter="flight-ready">Flight Ready</button>
           <button class="filter-tab" data-filter="in-concept">In Concept</button>
-          <button class="filter-tab" data-filter="purchasable">Purchasable</button>
+          <button class="filter-tab" data-filter="purchasable">RSI Store</button>
         </div>
 
         <div class="filter-controls">
@@ -55,8 +56,10 @@
           <select id="sortSelect" class="control-select" aria-label="Sort Ships">
             <option value="relevant">Sort: Most Relevant</option>
             <option value="name">Sort: Name (A–Z)</option>
-            <option value="price-asc">Sort: Price (Low → High)</option>
-            <option value="price-desc">Sort: Price (High → Low)</option>
+            <option value="auec-asc">Sort: In-Game aUEC (Low → High)</option>
+            <option value="auec-desc">Sort: In-Game aUEC (High → Low)</option>
+            <option value="price-asc">Sort: Pledge USD (Low → High)</option>
+            <option value="price-desc">Sort: Pledge USD (High → Low)</option>
             <option value="cargo-desc">Sort: Cargo (High → Low)</option>
           </select>
         </div>
@@ -107,6 +110,9 @@
 
               <div id="detailProdNote" class="prod-note hidden"></div>
 
+              <!-- In-Game aUEC Availability & Purchase Locations -->
+              <div id="detailIngameBox" class="ingame-box"></div>
+
               <div id="detailMetaLine" class="detail-meta-line"></div>
 
               <h3 class="section-heading">OVERVIEW</h3>
@@ -131,7 +137,8 @@
       <div class="footer-inner">
         <div class="footer-credits">
           <div class="footer-line-main">
-            Data via <a href="https://starcitizen-api.com/" target="_blank" rel="noopener noreferrer">starcitizen-api.com</a>
+            Data via <a href="https://starcitizen-api.com/" target="_blank" rel="noopener noreferrer">starcitizen-api.com</a>,
+            <a href="https://uexcorp.space/" target="_blank" rel="noopener noreferrer">UEX Corp</a>
             &amp; <a href="https://robertsspaceindustries.com/en/" target="_blank" rel="noopener noreferrer">Roberts Space Industries</a>
             &nbsp;•&nbsp; Planet Background: <strong>Nyx I</strong>
           </div>
