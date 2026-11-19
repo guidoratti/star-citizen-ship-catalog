@@ -33,6 +33,7 @@
   const detailPriceBadge = document.getElementById("detailPriceBadge");
   const detailStoreBadge = document.getElementById("detailStoreBadge");
   const detailProdNote = document.getElementById("detailProdNote");
+  const detailIngameBox = document.getElementById("detailIngameBox");
   const detailMetaLine = document.getElementById("detailMetaLine");
   const detailDescription = document.getElementById("detailDescription");
   const detailSpecs = document.getElementById("detailSpecs");
@@ -57,6 +58,11 @@
       return "$" + Number(ship.price).toLocaleString("en-US") + " USD";
     }
     return "Price N/A";
+  }
+
+  function formatAuec(val) {
+    if (val == null || Number(val) <= 0) return "";
+    return Number(val).toLocaleString("en-US") + " aUEC";
   }
 
   function displayCrew(ship) {
@@ -105,18 +111,25 @@
 
     if (q) {
       list = list.filter((s) => {
+        const locMatch = Array.isArray(s.ingame_locations) && s.ingame_locations.some((loc) =>
+          (loc.shop && loc.shop.toLowerCase().includes(q)) ||
+          (loc.location && loc.location.toLowerCase().includes(q))
+        );
         return (
           (s.name && s.name.toLowerCase().includes(q)) ||
           (s.manufacturer && s.manufacturer.toLowerCase().includes(q)) ||
           (s.manufacturer_code && s.manufacturer_code.toLowerCase().includes(q)) ||
           (s.focus && s.focus.toLowerCase().includes(q)) ||
           (s.type && s.type.toLowerCase().includes(q)) ||
-          (s.size && s.size.toLowerCase().includes(q))
+          (s.size && s.size.toLowerCase().includes(q)) ||
+          locMatch
         );
       });
     }
 
-    if (activeFilter === "flight-ready") {
+    if (activeFilter === "ingame") {
+      list = list.filter((s) => Boolean(s.ingame_available));
+    } else if (activeFilter === "flight-ready") {
       list = list.filter(isFlightReady);
     } else if (activeFilter === "in-concept") {
       list = list.filter((s) => !isFlightReady(s));
@@ -136,6 +149,10 @@
       });
     } else if (sortMode === "name") {
       list.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    } else if (sortMode === "auec-asc") {
+      list.sort((a, b) => (a.ingame_price_auec || 999999999999) - (b.ingame_price_auec || 999999999999));
+    } else if (sortMode === "auec-desc") {
+      list.sort((a, b) => (b.ingame_price_auec || 0) - (a.ingame_price_auec || 0));
     } else if (sortMode === "price-asc") {
       list.sort((a, b) => (a.price || 999999) - (b.price || 999999));
     } else if (sortMode === "price-desc") {
@@ -183,6 +200,20 @@
       const hasPrice = ship.price && Number(ship.price) > 0;
       const imgUrl = ship.image_thumb || ship.image_full || "";
 
+      let ingameHtml = "";
+      if (ship.ingame_available && ship.ingame_price_auec) {
+        const locs = Array.isArray(ship.ingame_locations) ? ship.ingame_locations : [];
+        const locSummary = locs.length > 1
+          ? `${locs[0].shop} (+${locs.length - 1} more)`
+          : (locs.length === 1 ? locs[0].shop : "In-Game Ship Shop");
+        ingameHtml = `
+          <div class="card-ingame">
+            <span class="card-ingame-price">Available in-game for ${escapeHtml(formatAuec(ship.ingame_price_auec))}</span>
+            <span class="card-ingame-loc">📍 ${escapeHtml(locSummary)}</span>
+          </div>
+        `;
+      }
+
       card.innerHTML = `
         <div class="card-media">
           <img src="${escapeAttr(imgUrl)}" alt="${escapeAttr(ship.name)}" loading="lazy" />
@@ -196,6 +227,7 @@
             <span class="card-price ${hasPrice ? "" : "na"}">${escapeHtml(priceText)}</span>
             <span class="card-mini-specs">Crew ${escapeHtml(displayCrew(ship))} &nbsp;•&nbsp; ${escapeHtml(displayCargo(ship))}</span>
           </div>
+          ${ingameHtml}
         </div>
       `;
 
@@ -245,6 +277,43 @@
       detailProdNote.classList.remove("hidden");
     } else {
       detailProdNote.classList.add("hidden");
+    }
+
+    // In-Game aUEC Availability & Purchase Locations
+    if (ship.ingame_available && ship.ingame_price_auec) {
+      detailIngameBox.className = "ingame-box";
+      const locs = Array.isArray(ship.ingame_locations) ? ship.ingame_locations : [];
+      const verTag = ship.ingame_version ? `<span class="ingame-ver">SC ${escapeHtml(ship.ingame_version)}</span>` : "";
+      const locsHtml = locs.length > 0
+        ? `
+          <div class="ingame-loc-heading">WHERE TO BUY IN-GAME</div>
+          <ul class="ingame-loc-list">
+            ${locs.map((loc) => `
+              <li class="ingame-loc-item">
+                <div>
+                  <div class="ingame-shop-name">📍 ${escapeHtml(loc.shop)}</div>
+                  ${loc.location ? `<div class="ingame-shop-place">${escapeHtml(loc.location)}</div>` : ""}
+                </div>
+                <span class="ingame-shop-price">${escapeHtml(formatAuec(loc.price))}</span>
+              </li>
+            `).join("")}
+          </ul>
+        `
+        : "";
+      detailIngameBox.innerHTML = `
+        <div class="ingame-header">
+          <span class="ingame-title">Available in-game for ${escapeHtml(formatAuec(ship.ingame_price_auec))}</span>
+          ${verTag}
+        </div>
+        ${locsHtml}
+      `;
+    } else {
+      detailIngameBox.className = "ingame-box unavailable";
+      detailIngameBox.innerHTML = `
+        <div class="ingame-header">
+          <span class="ingame-title">Not currently available for in-game aUEC purchase</span>
+        </div>
+      `;
     }
 
     detailMetaLine.textContent = `Role: ${ship.focus || "N/A"}   •   Type: ${ship.type || "N/A"}   •   Size: ${ship.size || "N/A"}`;
