@@ -468,4 +468,180 @@
   totalBadge.textContent = `${ships.length} Ships`;
   populateManufacturers();
   renderGrid();
+  initLiberatorArcade();
+
+  function initLiberatorArcade() {
+    const canvas = document.getElementById("liberatorCanvas");
+    const viewport = document.getElementById("liberatorViewport");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Click viewport to open the Anvil Liberator detail page
+    if (viewport) {
+      viewport.addEventListener("click", () => {
+        const lib = ships.find((s) => (s.name || "").toLowerCase() === "liberator") ||
+                    ships.find((s) => (s.name || "").toLowerCase().includes("liberator"));
+        if (lib) openShipDetail(lib);
+      });
+    }
+
+    const sprite = new Image();
+    sprite.src = "liberator_pixel.png";
+
+    // 3-layer retro parallax pixel stars
+    const starColors = ["#ffffff", "#bae6fd", "#fde68a", "#c4b5fd", "#7dd3fc"];
+    const stars = [];
+    for (let i = 0; i < 68; i++) {
+      const layer = i < 34 ? 0 : (i < 56 ? 1 : 2);
+      stars.push({
+        x: Math.floor(Math.random() * W),
+        y: Math.floor(Math.random() * (H - 12)),
+        speed: layer === 0 ? 0.35 : (layer === 1 ? 0.95 : 2.2),
+        size: layer === 2 ? 2 : 1,
+        color: layer === 0 ? "#475569" : starColors[i % starColors.length],
+        twinkle: Math.random() * Math.PI * 2,
+      });
+    }
+
+    // Distant slow-drifting 32-bit pixel planet
+    let planetX = W + 30;
+    const planetY = 26;
+
+    // Exhaust particles emitted from twin rear engines
+    const particles = [];
+    let frame = 0;
+
+    function spawnExhaust(ex, ey) {
+      particles.push({
+        x: ex,
+        y: ey + (Math.random() * 5 - 2.5),
+        vx: -(2.4 + Math.random() * 2.2),
+        vy: (Math.random() - 0.5) * 0.35,
+        life: 14 + Math.floor(Math.random() * 14),
+        maxLife: 28,
+        size: Math.random() > 0.45 ? 2 : 1,
+      });
+    }
+
+    function drawPixelPlanet(px, py) {
+      const r = 13;
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          const dist = dx * dx + dy * dy;
+          if (dist <= r * r) {
+            // Simple 32-bit crescent shading
+            if (dx > 4) ctx.fillStyle = "#1e1b4b";
+            else if (dx > -2) ctx.fillStyle = "#312e81";
+            else if ((dx + dy) % 5 === 0) ctx.fillStyle = "#6366f1";
+            else ctx.fillStyle = "#4338ca";
+            ctx.fillRect(Math.floor(px + dx), Math.floor(py + dy), 1, 1);
+          }
+        }
+      }
+      // Subtle pixel ring
+      ctx.fillStyle = "rgba(129, 140, 248, 0.55)";
+      ctx.fillRect(Math.floor(px - 19), Math.floor(py + 1), 38, 1);
+    }
+
+    function drawThrusterFlame(ex, ey, t) {
+      const flicker = Math.floor(Math.sin(t * 28 + ey) * 4 + Math.random() * 5);
+      const len = 14 + flicker;
+      // Outer electric blue glow
+      ctx.fillStyle = "#0284c7";
+      ctx.fillRect(ex - len - 4, ey - 3, len + 4, 7);
+      // Mid bright cyan jet
+      ctx.fillStyle = "#38bdf8";
+      ctx.fillRect(ex - len, ey - 2, len, 5);
+      // White-hot core
+      ctx.fillStyle = "#f0f9ff";
+      ctx.fillRect(ex - Math.max(5, Math.floor(len * 0.48)), ey - 1, Math.max(5, Math.floor(len * 0.48)), 3);
+    }
+
+    function tick() {
+      frame++;
+      const t = frame / 60;
+
+      // Deep space background
+      ctx.fillStyle = "#03050d";
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle 80s retro nebula band
+      ctx.fillStyle = "rgba(30, 27, 75, 0.28)";
+      ctx.fillRect(0, 24, W, 38);
+      ctx.fillStyle = "rgba(14, 116, 144, 0.12)";
+      ctx.fillRect(0, 44, W, 24);
+
+      // Slow distant planet
+      planetX -= 0.14;
+      if (planetX < -30) planetX = W + 45;
+      drawPixelPlanet(planetX, planetY);
+
+      // Parallax stars
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        s.x -= s.speed;
+        if (s.x < -2) {
+          s.x = W + 2;
+          s.y = Math.floor(Math.random() * (H - 14));
+        }
+        const blink = Math.sin(t * 5 + s.twinkle) > -0.75;
+        if (blink) {
+          ctx.fillStyle = s.color;
+          ctx.fillRect(Math.floor(s.x), s.y, s.size, s.size);
+        }
+      }
+
+      // Liberator ship position (gentle retro cruise hover)
+      const shipW = 144;
+      const shipH = 74;
+      const shipX = Math.floor(W * 0.5 - shipW * 0.45 + Math.cos(t * 1.1) * 6);
+      const shipY = Math.floor(14 + Math.sin(t * 2.3) * 3.5);
+
+      // Twin rear engine nozzles on left side of the Liberator sprite
+      const topEngineX = shipX + 2;
+      const topEngineY = shipY + 11;
+      const botEngineX = shipX + 2;
+      const botEngineY = shipY + 50;
+
+      // Spawn & update exhaust pixel particles
+      if (frame % 2 === 0) {
+        spawnExhaust(topEngineX - 4, topEngineY);
+        spawnExhaust(botEngineX - 4, botEngineY);
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        const ratio = p.life / p.maxLife;
+        if (ratio > 0.6) ctx.fillStyle = "#7dd3fc";
+        else if (ratio > 0.3) ctx.fillStyle = "#0ea5e9";
+        else ctx.fillStyle = "#1d4ed8";
+        ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+      }
+
+      // Draw twin thruster flames behind engines
+      drawThrusterFlame(topEngineX, topEngineY, t);
+      drawThrusterFlame(botEngineX, botEngineY, t);
+
+      // Draw crisp pixel-art Anvil Liberator sprite
+      if (sprite.complete && sprite.naturalWidth > 0) {
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(sprite, shipX, shipY, shipW, shipH);
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
 })();
