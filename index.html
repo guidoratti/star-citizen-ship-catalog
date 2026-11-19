@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Star Citizen — Ship Catalog</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Fixed Nyx I Planet Background + Atmospheric Gradient -->
+  <div class="bg-nyx" aria-hidden="true"></div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <!-- TOP HEADER BAR -->
+    <header class="top-header">
+      <div class="header-inner">
+        <div class="brand" id="brandHome" title="Back to Ship Catalog">
+          <span class="brand-sub">STAR CITIZEN</span>
+          <h1 class="brand-title">SHIP CATALOG</h1>
+        </div>
+
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search ships, manufacturers, roles (e.g. Constellation, Aegis, Fighter)..."
+            autocomplete="off"
+          />
+          <button id="clearSearchBtn" class="clear-btn hidden" title="Clear search" aria-label="Clear search">✕</button>
+        </div>
+
+        <div class="header-meta">
+          <span id="totalBadge" class="meta-pill">Loading...</span>
+        </div>
+      </div>
+
+      <!-- FILTER & SORT BAR -->
+      <div class="filter-bar" id="filterBar">
+        <div class="filter-tabs" role="tablist">
+          <button class="filter-tab active" data-filter="relevant">★ Most Relevant</button>
+          <button class="filter-tab" data-filter="all">All Ships</button>
+          <button class="filter-tab" data-filter="flight-ready">Flight Ready</button>
+          <button class="filter-tab" data-filter="in-concept">In Concept</button>
+          <button class="filter-tab" data-filter="purchasable">Purchasable</button>
+        </div>
+
+        <div class="filter-controls">
+          <span id="resultCount" class="result-count"></span>
+          <select id="mfgSelect" class="control-select" aria-label="Filter by Manufacturer">
+            <option value="all">All Manufacturers</option>
+          </select>
+          <select id="sortSelect" class="control-select" aria-label="Sort Ships">
+            <option value="relevant">Sort: Most Relevant</option>
+            <option value="name">Sort: Name (A–Z)</option>
+            <option value="price-asc">Sort: Price (Low → High)</option>
+            <option value="price-desc">Sort: Price (High → Low)</option>
+            <option value="cargo-desc">Sort: Cargo (High → Low)</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- CATALOG GRID VIEW -->
+      <section id="catalogView" class="catalog-view">
+        <div id="shipGrid" class="ship-grid"></div>
+        <div id="emptyState" class="empty-state hidden">
+          <p>No ships matched your search or filters.</p>
+          <button id="resetFiltersBtn" class="btn-secondary">Reset Filters</button>
+        </div>
+      </section>
+
+      <!-- SHIP DETAIL VIEW -->
+      <section id="detailView" class="detail-view hidden">
+        <div class="detail-topbar">
+          <button id="backBtn" class="btn-secondary">← Back to Ship Catalog</button>
+          <a id="rsiLinkBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary">
+            Open Official RSI Page ↗
+          </a>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-grid">
+            <!-- Left: Official RSI Ship Image -->
+            <div class="detail-media">
+              <div class="hero-image-frame" id="heroFrame" title="Click to view full-resolution image">
+                <img id="detailImg" src="" alt="" />
+                <div class="zoom-hint">🔍 Click to enlarge</div>
+              </div>
+              <p class="media-caption">Official RSI Ship Matrix Image</p>
+            </div>
+
+            <!-- Right: Info, Status, Price, Overview, Specs -->
+            <div class="detail-info">
+              <div id="detailMfg" class="detail-mfg"></div>
+              <h2 id="detailName" class="detail-name"></h2>
+
+              <div class="detail-badges">
+                <span id="detailStatusBadge" class="pill"></span>
+                <span id="detailPriceBadge" class="pill pill-gold"></span>
+                <span id="detailStoreBadge" class="pill pill-store"></span>
+              </div>
+
+              <div id="detailProdNote" class="prod-note hidden"></div>
+
+              <div id="detailMetaLine" class="detail-meta-line"></div>
+
+              <h3 class="section-heading">OVERVIEW</h3>
+              <p id="detailDescription" class="detail-desc"></p>
+
+              <h3 class="section-heading">TECHNICAL SPECIFICATIONS</h3>
+              <div id="detailSpecs" class="specs-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Standard Loadout / Components -->
+        <div id="componentsCard" class="detail-card components-card hidden">
+          <h3 class="section-heading">STANDARD LOADOUT &amp; COMPONENTS</h3>
+          <div id="componentsGrid" class="components-grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- BOTTOM FOOTER BAR WITH PAYPAL DONATION BUTTON -->
+    <footer class="bottom-footer">
+      <div class="footer-inner">
+        <div class="footer-credits">
+          <div class="footer-line-main">
+            Data via <a href="https://starcitizen-api.com/" target="_blank" rel="noopener noreferrer">starcitizen-api.com</a>
+            &amp; <a href="https://robertsspaceindustries.com/en/" target="_blank" rel="noopener noreferrer">Roberts Space Industries</a>
+            &nbsp;•&nbsp; Planet Background: <strong>Nyx I</strong>
+          </div>
+          <div class="footer-line-sub">
+            Unofficial Star Citizen fan catalog — click any ship for image, info, price &amp; flight status.
+          </div>
+        </div>
+
+        <a
+          class="paypal-btn"
+          href="https://www.paypal.com/donate/?business=gratti%40gmail.com&no_recurring=0&currency_code=USD&item_name=Support+Star+Citizen+Ship+Catalog"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Support the creator via PayPal (gratti@gmail.com)"
+        >
+          ♥ &nbsp;Donate via PayPal
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- FULLSCREEN IMAGE LIGHTBOX -->
+  <div id="lightbox" class="lightbox hidden" role="dialog" aria-modal="true">
+    <button id="lightboxClose" class="lightbox-close" aria-label="Close">✕</button>
+    <img id="lightboxImg" src="" alt="" />
+  </div>
+
+  <script src="ships-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
